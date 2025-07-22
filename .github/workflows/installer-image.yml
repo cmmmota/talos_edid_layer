@@ -39,7 +39,7 @@ jobs:
           ARCHES=amd64
           EXT_ARGS=$(awk '{print " --system-extension-image "$0}' extensions.list | tr -d '\n')
           mkdir -p _out
-          docker run --rm --privileged -v $(pwd)/_out:/out \
+          docker run --rm --privileged -v /dev:/dev -v $(pwd)/_out:/out \
             ghcr.io/siderolabs/imager:${TALOS_VER} \
             --arch ${ARCHES} ${EXT_ARGS} metal
 

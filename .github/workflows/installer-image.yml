@@ -33,21 +33,33 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build installer with extensions
+      - name: Build & push installer OCI image
         run: |
           TALOS_VER=v${{ steps.talos.outputs.version }}
           ARCHES=amd64
           EXT_ARGS=$(awk '{print " --system-extension-image "$0}' extensions.list | tr -d '\n')
-          mkdir -p _out
-          docker run --rm --privileged -v /dev:/dev -v $(pwd)/_out:/out \
-            ghcr.io/siderolabs/imager:${TALOS_VER} \
-            --arch ${ARCHES} ${EXT_ARGS} metal
 
-      - name: Upload metal disk image artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: talos-v${{ steps.talos.outputs.version }}-metal-thinktank-${{ github.run_number }}
-          path: |
-            _out/metal*.raw
-            _out/metal*.raw.zst
-          retention-days: 14 
+          mkdir -p _out/installer
+          docker run --rm --privileged \
+            -v /dev:/dev \
+            -v "${{ github.workspace }}/_out/installer":/out \
+            ghcr.io/siderolabs/imager:${TALOS_VER} \
+            --arch ${ARCHES} ${EXT_ARGS} installer
+
+          # Load the tar that imager writes
+          docker load -i _out/installer/installer-amd64.tar
+
+          BASE=ghcr.io/siderolabs/installer-base:${TALOS_VER}
+          if ! docker image inspect $BASE >/dev/null 2>&1; then
+            BASE=ghcr.io/siderolabs/installer:${TALOS_VER}
+          fi
+
+          # Tag & push to GHCR
+          docker tag $BASE \
+                    ghcr.io/${{ github.repository_owner }}/thinktank-talos-installer:${TALOS_VER}
+          docker push ghcr.io/${{ github.repository_owner }}/thinktank-talos-installer:${TALOS_VER}
+
+          # (optional) move latest tag
+          docker tag ghcr.io/${{ github.repository_owner }}/thinktank-talos-installer:${TALOS_VER} \
+                     ghcr.io/${{ github.repository_owner }}/thinktank-talos-installer:latest
+          docker push ghcr.io/${{ github.repository_owner }}/thinktank-talos-installer:latest 

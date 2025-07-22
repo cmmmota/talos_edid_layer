@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.4
+# syntax=docker/dockerfile:1.17
 
 # ------------------------------------------------------------------------------
 # Talos system-extension image that ships a custom EDID binary

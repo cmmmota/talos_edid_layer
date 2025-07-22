@@ -4,21 +4,43 @@
     "config:base",
     ":semanticCommits",
     ":semanticCommitTypeAll(chore)",
-    ":prHourlyLimit10",
-    "docker:disableMajor",
-    "github-actions:disableMajor"
+    "docker:disableMajor"
   ],
   "labels": ["dependencies"],
   "commitMessagePrefix": "chore: ",
   "enabledManagers": ["dockerfile", "github-actions"],
-  "packageRules": [
+  "packageRules": [],
+  "regexManagers": [
     {
-      "matchManagers": ["dockerfile"],
-      "addLabels": ["docker"]
+      "description": "Watch extension images pinned in extensions.list",
+      "fileMatch": ["^extensions\\.list$"],
+      "matchStrings": [
+        "^(?<depName>ghcr\\.io/[^@:]+)(?::(?<currentValue>[^@]+))?@sha256:(?<digest>[a-f0-9]{64})$"
+      ],
+      "datasourceTemplate": "docker",
+      "versioningTemplate": "docker",
+      "extractVersionTemplate": "{{currentValue}}",
+      "depNameTemplate": "{{depName}}"
     },
     {
-      "matchManagers": ["github-actions"],
-      "addLabels": ["github-actions"]
+      "description": "Track Talos version hard-coded in installer workflow",
+      "fileMatch": ["^\\.github/workflows/installer-image\\.yml$"],
+      "matchStrings": [
+        "version=(?<currentValue>[0-9]+\\.[0-9]+\\.[0-9]+)"
+      ],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "siderolabs/talos",
+      "extractVersionTemplate": "v{{currentValue}}"
+    },
+    {
+      "description": "Track Talos series in EDID Dockerfile",
+      "fileMatch": ["^Dockerfile$"],
+      "matchStrings": [
+        "ARG\\s+TALOS_SERIES=(?<currentValue>\\d+\\.\\d+)"
+      ],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "siderolabs/talos",
+      "extractVersionTemplate": "v{{currentValue}}.0"
     }
   ]
 } 

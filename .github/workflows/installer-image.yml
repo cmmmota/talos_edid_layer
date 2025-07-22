@@ -1,0 +1,51 @@
+name: Build & Publish Talos installer
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'extensions.list'
+      - '.github/workflows/installer-image.yml'
+      - '.github/renovate.json'
+  workflow_dispatch:
+
+jobs:
+  build-install-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set Talos version
+        id: talos
+        run: echo "version=1.10.5" >> $GITHUB_OUTPUT
+
+      - name: Show chosen Talos version
+        run: echo "Building *metal* image for Talos v${{ steps.talos.outputs.version }} (amd64)"
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build installer with extensions
+        run: |
+          TALOS_VER=v${{ steps.talos.outputs.version }}
+          ARCHES=amd64
+          EXT_ARGS=$(awk '{print " --system-extension-image "$0}' extensions.list | tr -d '\n')
+          mkdir -p _out
+          docker run --rm --privileged -v $(pwd)/_out:/out \
+            ghcr.io/siderolabs/imager:${TALOS_VER} \
+            --arch ${ARCHES} ${EXT_ARGS} metal
+
+      - name: Upload metal disk image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: talos-v${{ steps.talos.outputs.version }}-metal-thinktank-${{ github.run_number }}
+          path: _out/metal-amd64.raw.gz
+          retention-days: 14 

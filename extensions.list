@@ -1,0 +1,5 @@
+ghcr.io/siderolabs/intel-ucode:20250512@sha256:85bd2fe233e36251db42d1cb176b414629612865d88fae3e22ea92436d734c9e
+ghcr.io/siderolabs/uinput:v1.10.5@sha256:3b70f77a6994ccbe29104c20838ae035030a9430a88ce7b0de2523701a45ae62
+ghcr.io/siderolabs/nvidia-open-gpu-kernel-modules-production:570.148.08-v1.10.5@sha256:5b8225997d6b3d5c52e1f4020a0810f8975e5f3ae1936e5be368bcf806ea8eea
+ghcr.io/siderolabs/nonfree-kmod-nvidia-production:570.148.08-v1.10.5@sha256:004d9621e6eb69f72cfcf6e295cba72356793db3ddeb3bfdda61a2e3eb728714
+ghcr.io/siderolabs/nvidia-container-toolkit-production:570.158.01-v1.17.8@sha256:61132aeebcd49c5675e869ef661783dada72e70c1b678bd8f8ee692f75c45464 

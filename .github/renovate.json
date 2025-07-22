@@ -1,19 +1,27 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:base",
+    "config:recommended",
     ":semanticCommits",
     ":semanticCommitTypeAll(chore)",
     "docker:disableMajor"
   ],
-  "labels": ["dependencies"],
+  "labels": [
+    "dependencies"
+  ],
   "commitMessagePrefix": "chore: ",
-  "enabledManagers": ["dockerfile", "github-actions"],
+  "enabledManagers": [
+    "dockerfile",
+    "github-actions"
+  ],
   "packageRules": [],
-  "regexManagers": [
+  "customManagers": [
     {
+      "customType": "regex",
       "description": "Watch extension images pinned in extensions.list",
-      "fileMatch": ["^extensions\\.list$"],
+      "managerFilePatterns": [
+        "/^extensions\\.list$/"
+      ],
       "matchStrings": [
         "^(?<depName>ghcr\\.io/[^@:]+)(?::(?<currentValue>[^@]+))?@sha256:(?<digest>[a-f0-9]{64})$"
       ],
@@ -23,8 +31,11 @@
       "depNameTemplate": "{{depName}}"
     },
     {
+      "customType": "regex",
       "description": "Track Talos version hard-coded in installer workflow",
-      "fileMatch": ["^\\.github/workflows/installer-image\\.yml$"],
+      "managerFilePatterns": [
+        "/^\\.github/workflows/installer-image\\.yml$/"
+      ],
       "matchStrings": [
         "version=(?<currentValue>[0-9]+\\.[0-9]+\\.[0-9]+)"
       ],
@@ -33,8 +44,11 @@
       "extractVersionTemplate": "v{{currentValue}}"
     },
     {
+      "customType": "regex",
       "description": "Track Talos series in EDID Dockerfile",
-      "fileMatch": ["^Dockerfile$"],
+      "managerFilePatterns": [
+        "/^Dockerfile$/"
+      ],
       "matchStrings": [
         "ARG\\s+TALOS_SERIES=(?<currentValue>\\d+\\.\\d+)"
       ],
@@ -43,4 +57,4 @@
       "extractVersionTemplate": "v{{currentValue}}.0"
     }
   ]
-} 
+}

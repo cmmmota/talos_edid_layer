@@ -1,0 +1,12 @@
+version: v1alpha1
+metadata:
+  name: edid-fix
+  version: 1.0.0
+  author: Carlos Mota <cmmmota@hotmail.com>
+  description: |
+    Provides custom EDID binary(ies) under /usr/lib/firmware/edid so that
+    the kernel parameter `drm.edid_firmware=<connector>:edid/<file>` can be
+    used to fake a monitor for head-less / virtualised GPUs.
+  compatibility:
+    talos:
+      version: ">= v1.7.0"

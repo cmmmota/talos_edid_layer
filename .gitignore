@@ -1,0 +1,26 @@
+# ----------------------------------------------------------------------------
+# Global ignores
+# ----------------------------------------------------------------------------
+*.swp
+*.swo
+*.tmp
+*~
+.DS_Store
+
+# Editor / IDE directories
+.vscode/
+.idea/
+
+# Build artifacts & caches
+_out/
+rootfs.tar
+build/
+dist/
+*.sqsh
+
+# Docker buildx cache
+.cache/
+
+# Local env files / secrets
+.env
+.env.* 

@@ -44,21 +44,35 @@ $ make push
 
 The *Makefile* automatically tags `$IMAGE_REPO/$IMAGE_NAME:latest` (defaults to `ghcr.io/<gituser>/talos-edid-extension`).
 
-### 3.  Reference the extension in Talos machine-config
+### 3.  Consume the **installer image** (Talos ≥ v1.5)
+
+The CI workflow in this repo produces a ready-made installer OCI image at
+
+```
+ghcr.io/<owner>/talos-installer:v<talos-series>
+```
+
+This image already contains **all** required extensions (your EDID overlay
+plus the official Nvidia/Intel/uinput ones).  Use it in the machine
+configuration:
 
 ```yaml
 machine:
   install:
-    # 1) Tell the installer to pull the system-extension image
-    extensions:
-      - image: ghcr.io/<username>/talos-edid-extension@sha256:<digest>
-    # 2) Pass the kernel argument so the GPU driver picks up the EDID
+    image: ghcr.io/<owner>/talos-installer:v1.10.5  # ← exact tag pushed by CI
+    # Pass the kernel argument so the GPU driver picks up the EDID
     extraKernelArgs:
-      # Change "HDMI-A-1" to the connector you need (see `drm_info` output)
+      # change connector if needed (find via `dmesg | grep -i connect`)
       - drm.edid_firmware=HDMI-A-1:edid/custom.edid
 ```
 
-Reboot (or reinstall) the node – Talos will bake the extension into `initramfs` and mount the EDID at boot time.
+Talos pulls this custom installer during the install or upgrade step, so
+the EDID (and other extensions) are active right after the first reboot.
+
+If you install via PXE/USB you can alternatively download the **metal disk
+image** artefact from the workflow (file name
+`talos-v<version>-metal-thinktank-<run>.raw.gz`) and flash/serve it – it
+already has the same extensions baked in.
 
 ---
 ## FAQ
@@ -66,38 +80,4 @@ Reboot (or reinstall) the node – Talos will bake the extension into `initramfs
 ### Where do I get an EDID *.bin file?
 
 *   Extract from a working monitor using `get-edid | parse-edid` (Linux) or `edid-decode`.
-*   Use tools such as `wxEDID` or *Custom Resolution Utility* (CRU) on Windows.
-*   Online generators exist for common resolutions, e.g. 1920×1080 / 4K.
-
-### How do I know the connector name to use in `drm.edid_firmware`?
-
-Boot a Talos live ISO (or any Linux) on the target machine and run:
-
-```bash
-dmesg | grep -i connect
-```
-
-Look for lines like `HDMI-A-1`, `DP-0`, `DVI-D-0` etc. – use the exact string before the colon.
-
-### Can I host the image privately?
-
-Yes – any OCI compliant registry works.  
-Set `IMAGE_REPO=<registry_host>/<namespace>` when running *make* or build/push manually:
-
-```bash
-docker buildx build --platform linux/amd64,linux/arm64 -t registry.local/edid-ext:1.0 .
-docker push registry.local/edid-ext:1.0
-```
-
-Make sure your Talos nodes (installer) can reach the registry and configure auth if required (`machine.install.registryAuth`).
-
----
-## Advanced – GitHub Actions CI
-
-A ready-to-use workflow is included under `.github/workflows/image.yml` (not committed by default).  
-It builds multi-arch images on every push and attaches a signed provenance to satisfy Talos’ image-signature verification.
-
----
-## License
-
-MIT – do as you wish, no warranties.
+*   Use tools such as `

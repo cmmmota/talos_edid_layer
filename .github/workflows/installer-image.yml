@@ -47,5 +47,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: talos-v${{ steps.talos.outputs.version }}-metal-thinktank-${{ github.run_number }}
-          path: _out/metal*.raw.gz
+          path: |
+            _out/metal*.raw
+            _out/metal*.raw.zst
           retention-days: 14 

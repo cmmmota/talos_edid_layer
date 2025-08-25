@@ -23,7 +23,8 @@
         "/^extensions\\.list$/"
       ],
       "matchStrings": [
-        "^(?<depName>ghcr\\.io/[^@:]+)(?::(?<currentValue>[^@]+))?@sha256:(?<digest>[a-f0-9]{64})$"
+        "^(?<depName>ghcr\\.io/[^@:]+)(?::(?<currentValue>[^@]+))?@sha256:(?<digest>[a-f0-9]{64})$",
+        "^(?<depName>ghcr\\.io/[^@:]+):(?<currentValue>[^@]+)$"
       ],
       "datasourceTemplate": "docker",
       "versioningTemplate": "docker",

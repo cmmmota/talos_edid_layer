@@ -8,7 +8,7 @@
 #  2. rootfs/        – files that will be overlayed on the Talos root filesystem
 # ------------------------------------------------------------------------------
 
-ARG TALOS_VERSION=1.10.5
+ARG TALOS_VERSION=1.10.6
 
 FROM scratch
 

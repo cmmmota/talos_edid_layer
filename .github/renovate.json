@@ -20,8 +20,8 @@
     {
       "customType": "regex",
       "description": "Watch extension images pinned in extensions.list",
-      "managerFilePatterns": [
-        "/^extensions\\.list$/"
+      "fileMatch": [
+        "extensions\\.list$"
       ],
       "matchStrings": [
         "^(?<depName>ghcr\\.io/[^@:]+)(?::(?<currentValue>[^@]+))?@sha256:(?<digest>[a-f0-9]{64})$",

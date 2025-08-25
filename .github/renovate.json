@@ -12,7 +12,8 @@
   "commitMessagePrefix": "chore: ",
   "enabledManagers": [
     "dockerfile",
-    "github-actions"
+    "github-actions",
+    "regex"
   ],
   "packageRules": [],
   "customManagers": [
